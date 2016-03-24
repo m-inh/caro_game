@@ -1,6 +1,3 @@
-/*
- * Decompiled with CFR 0_102.
- */
 package com.t3h.main;
 
 import com.t3h.other.GUI;

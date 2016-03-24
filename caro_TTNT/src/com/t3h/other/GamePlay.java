@@ -1,9 +1,5 @@
-/*
- * Decompiled with CFR 0_102.
- */
 package com.t3h.other;
 
-import com.t3h.other.Brain;
 import com.t3h.other.Caro;
 import com.t3h.other.CaroManager;
 import com.t3h.other.GUI;
@@ -19,16 +15,14 @@ import java.awt.Stroke;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.Random;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
-public class AutoPlay
-extends JPanel
-implements Runnable {
+public class GamePlay
+extends JPanel {
     public static final int WIDTH_PANEL = 1000;
     public static final int HEIGHT_PANEL = 600;
     public int column_number = 20;
@@ -43,45 +37,61 @@ implements Runnable {
     private JButton menu;
     private JLabel xPoint;
     private JLabel oPoint;
-    private volatile int luot;
-    private Brain brain;
-    private Random random;
-    private Thread th;
     private MouseAdapter clickReset;
     private MouseAdapter clickMenu;
     private MouseAdapter click;
 
-    public AutoPlay() {
+    public GamePlay() {
         this.clickReset = new MouseAdapter(){
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                AutoPlay.this.newGame();
-                AutoPlay.this.repaint();
+                GamePlay.this.newGame();
+                GamePlay.this.repaint();
             }
         };
         this.clickMenu = new MouseAdapter(){
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                AutoPlay.this.setVisible(false);
-                AutoPlay.this.gui.setMenu();
+                GamePlay.this.setVisible(false);
+                GamePlay.this.gui.setMenu();
             }
         };
         this.click = new MouseAdapter(){
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                Caro caro = new Caro(e.getX(), e.getY(), 0);
-                if (!AutoPlay.access$2((AutoPlay)AutoPlay.this).stop && e.getX() <= 1000 && e.getY() <= 600 && AutoPlay.this.luot == 1 && AutoPlay.this.caroMGR.add(caro)) {
-                    AutoPlay.this.repaint();
-                    if (!AutoPlay.access$2((AutoPlay)AutoPlay.this).stop) {
-                        AutoPlay autoPlay = AutoPlay.this;
-                        AutoPlay.access$4(autoPlay, autoPlay.luot * -1);
-                    } else {
-                        AutoPlay autoPlay = AutoPlay.this;
-                        AutoPlay.access$6(autoPlay, autoPlay.oTimeWin + 1);
-                        AutoPlay.this.thongBao();
+                super.mouseClicked(e);
+                Caro caro = new Caro(e.getX(), e.getY(), GamePlay.this.count % 2);
+                if (!caroMGR.stop && e.getX() <= 1000 && e.getY() <= 600 && GamePlay.this.caroMGR.add(caro)) {
+                    GamePlay gamePlay = GamePlay.this;
+                    GamePlay.access4(gamePlay, gamePlay.count + 1);
+                    if (caroMGR.stop) {
+                        if (caro.getType() == 1) {
+                            GamePlay gamePlay2 = GamePlay.this;
+                            GamePlay.access6(gamePlay2, gamePlay2.xTimeWin + 1);
+                        } else {
+                            GamePlay gamePlay3 = GamePlay.this;
+                            GamePlay.access8(gamePlay3, gamePlay3.oTimeWin + 1);
+                        }
+                    }
+                }
+                GamePlay.this.repaint();
+                if (caroMGR.stop) {
+                    int option = JOptionPane.showConfirmDialog(null, "Ch\u01a1i l\u1ea1i? (B\u1ea5m No ho\u1eb7c Cancel l\u00e0 ch\u00f3 -_-)");
+                    switch (option) {
+                        case 0: {
+                            GamePlay.this.newGame();
+                            GamePlay.this.repaint();
+                            break;
+                        }
+                        case 1: {
+                            break;
+                        }
+                        case 2: {
+                            break;
+                        }
                     }
                 }
             }
@@ -109,11 +119,6 @@ implements Runnable {
         this.oPoint.setFont(new Font("Tahoma", 50, 50));
         this.oPoint.setBounds(1026, 120, 140, 150);
         this.add(this.oPoint);
-        this.brain = new Brain(this.column_number, this.row_number);
-        this.random = new Random();
-        this.luot = 1;
-        this.th = new Thread(this);
-        this.th.start();
     }
 
     public void setGui(GUI gui) {
@@ -122,8 +127,6 @@ implements Runnable {
 
     private void newGame() {
         this.caroMGR = new CaroManager(this.column_number, this.row_number);
-        this.count = 0;
-        this.luot*=-1;
     }
 
     @Override
@@ -152,56 +155,16 @@ implements Runnable {
         }
     }
 
-    private void thongBao() {
-        int option = JOptionPane.showConfirmDialog(null, "Ch\u01a1i l\u1ea1i? (B\u1ea5m No ho\u1eb7c Cancel l\u00e0 ch\u00f3 -_-)");
-        switch (option) {
-            case 0: {
-                this.newGame();
-                this.repaint();
-                break;
-            }
-            case 1: {
-                break;
-            }
-            case 2: {
-                break;
-            }
-        }
+    static /* synthetic */ void access4(GamePlay gamePlay, int n) {
+        gamePlay.count = n;
     }
 
-    @Override
-    public void run() {
-        do {
-            if (!(this.luot != -1 || this.caroMGR.stop)) {
-                Caro caro;
-                while (!this.caroMGR.add(caro = this.brain.nextCaro(this.caroMGR.getMatrix_x(), this.caroMGR.getMatrix_o()))) {
-                }
-                this.repaint();
-                if (!this.caroMGR.stop) {
-                    this.luot*=-1;
-                } else {
-                    ++this.xTimeWin;
-                    this.thongBao();
-                }
-            }
-            try {
-                Thread.sleep(100);
-                continue;
-            }
-            catch (InterruptedException e) {
-                e.printStackTrace();
-                continue;
-            }
-            break;
-        } while (true);
+    static /* synthetic */ void access6(GamePlay gamePlay, int n) {
+        gamePlay.xTimeWin = n;
     }
 
-    static /* synthetic */ void access$4(AutoPlay autoPlay, int n) {
-        autoPlay.luot = n;
-    }
-
-    static /* synthetic */ void access$6(AutoPlay autoPlay, int n) {
-        autoPlay.oTimeWin = n;
+    static /* synthetic */ void access8(GamePlay gamePlay, int n) {
+        gamePlay.oTimeWin = n;
     }
 
 }
